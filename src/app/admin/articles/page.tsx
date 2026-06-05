@@ -97,7 +97,7 @@ export default async function AdminArticlesListPage() {
         </div>
       ) : (
         <div className="py-24 border border-dashed border-border text-center text-text-secondary text-sm rounded-sm">
-          No articles written yet. Click "New Article" to write your first story.
+          No articles written yet. Click &quot;New Article&quot; to write your first story.
         </div>
       )}
     </div>

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { JobCard } from "@/components/ui/JobCard";
 import { Pagination } from "@/components/ui/Pagination";
@@ -109,12 +110,12 @@ export default async function JobsPage({ searchParams }: JobsPageProps) {
 
         <div className="flex justify-end gap-3">
           {(searchQuery || selectedType) && (
-            <a
+            <Link
               href="/jobs"
               className="text-xs uppercase tracking-widest text-text-secondary hover:text-accent font-medium py-3 px-6 transition-colors border border-transparent rounded-sm flex items-center"
             >
               Reset Filters
-            </a>
+            </Link>
           )}
           <button
             type="submit"

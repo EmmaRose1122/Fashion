@@ -91,7 +91,7 @@ export default async function AdminJobsListPage() {
         </div>
       ) : (
         <div className="py-24 border border-dashed border-border text-center text-text-secondary text-sm rounded-sm">
-          No job opportunities posted yet. Click "New Job Listing" to create your first vacancy.
+          No job opportunities posted yet. Click &quot;New Job Listing&quot; to create your first vacancy.
         </div>
       )}
     </div>
