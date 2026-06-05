@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { prisma } from "@/lib/prisma";
+import { supabase } from "@/lib/supabase";
 import { JobCard } from "@/components/ui/JobCard";
 import { Pagination } from "@/components/ui/Pagination";
 import { JOBS_PER_PAGE, JOB_TYPES } from "@/lib/constants";
@@ -31,32 +31,39 @@ export default async function JobsPage({ searchParams }: JobsPageProps) {
   const searchQuery = resolvedParams.q || "";
   const selectedType = resolvedParams.type || "";
 
-  // Prisma query filters
-  const whereClause: any = {
-    active: true,
-  };
+  // Supabase query filters
+  let countQuery = supabase
+    .from("Job")
+    .select("*", { count: "exact", head: true })
+    .eq("active", true);
 
-  if (searchQuery) {
-    whereClause.OR = [
-      { title: { contains: searchQuery, mode: "insensitive" } },
-      { company: { contains: searchQuery, mode: "insensitive" } },
-      { description: { contains: searchQuery, mode: "insensitive" } },
-    ];
-  }
+  let jobsQuery = supabase
+    .from("Job")
+    .select("*")
+    .eq("active", true);
 
   if (selectedType) {
-    whereClause.type = selectedType;
+    countQuery = countQuery.eq("type", selectedType);
+    jobsQuery = jobsQuery.eq("type", selectedType);
   }
 
-  const totalJobs = await prisma.job.count({ where: whereClause });
+  if (searchQuery) {
+    const filterStr = `title.ilike.%${searchQuery}%,company.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`;
+    countQuery = countQuery.or(filterStr);
+    jobsQuery = jobsQuery.or(filterStr);
+  }
+
+  const totalJobs = (await countQuery).count || 0;
   const totalPages = Math.ceil(totalJobs / JOBS_PER_PAGE);
 
-  const jobs = await prisma.job.findMany({
-    where: whereClause,
-    orderBy: { createdAt: "desc" },
-    skip: (currentPage - 1) * JOBS_PER_PAGE,
-    take: JOBS_PER_PAGE,
-  });
+  const from = (currentPage - 1) * JOBS_PER_PAGE;
+  const to = from + JOBS_PER_PAGE - 1;
+
+  const jobs = (
+    await jobsQuery
+      .order("createdAt", { ascending: false })
+      .range(from, to)
+  ).data || [];
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-12 md:py-20 space-y-12">

@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { prisma } from "@/lib/prisma";
+import { supabase } from "@/lib/supabase";
 import { slugify, calculateReadTime } from "@/lib/utils";
 
 export type ArticleActionState = {
@@ -33,7 +33,11 @@ export async function createArticle(
   let slug = baseSlug;
   let count = 1;
   while (true) {
-    const existing = await prisma.article.findUnique({ where: { slug } });
+    const { data: existing } = await supabase
+      .from("Article")
+      .select("id")
+      .eq("slug", slug)
+      .maybeSingle();
     if (!existing) break;
     slug = `${baseSlug}-${count++}`;
   }
@@ -47,21 +51,20 @@ export async function createArticle(
   const readTime = calculateReadTime(content);
 
   try {
-    await prisma.article.create({
-      data: {
-        title,
-        slug,
-        content,
-        excerpt: excerpt || null,
-        category,
-        thumbnail: thumbnail || null,
-        author,
-        tags,
-        published,
-        featured,
-        readTime,
-      },
+    const { error } = await supabase.from("Article").insert({
+      title,
+      slug,
+      content,
+      excerpt: excerpt || null,
+      category,
+      thumbnail: thumbnail || null,
+      author,
+      tags,
+      published,
+      featured,
+      readTime,
     });
+    if (error) throw error;
   } catch (err) {
     console.error("Failed to create article:", err);
     return { error: "Database error. Failed to create article." };
@@ -93,7 +96,11 @@ export async function updateArticle(
   }
 
   // Get current article to check slug change
-  const current = await prisma.article.findUnique({ where: { id } });
+  const { data: current } = await supabase
+    .from("Article")
+    .select("slug, title")
+    .eq("id", id)
+    .maybeSingle();
   if (!current) {
     return { error: "Article not found." };
   }
@@ -104,7 +111,11 @@ export async function updateArticle(
     slug = baseSlug;
     let count = 1;
     while (true) {
-      const existing = await prisma.article.findUnique({ where: { slug } });
+      const { data: existing } = await supabase
+        .from("Article")
+        .select("id")
+        .eq("slug", slug)
+        .maybeSingle();
       if (!existing || existing.id === id) break;
       slug = `${baseSlug}-${count++}`;
     }
@@ -118,9 +129,9 @@ export async function updateArticle(
   const readTime = calculateReadTime(content);
 
   try {
-    await prisma.article.update({
-      where: { id },
-      data: {
+    const { error } = await supabase
+      .from("Article")
+      .update({
         title,
         slug,
         content,
@@ -132,8 +143,9 @@ export async function updateArticle(
         published,
         featured,
         readTime,
-      },
-    });
+      })
+      .eq("id", id);
+    if (error) throw error;
   } catch (err) {
     console.error("Failed to update article:", err);
     return { error: "Database error. Failed to update article." };
@@ -148,7 +160,13 @@ export async function updateArticle(
 
 export async function deleteArticle(id: string) {
   try {
-    const article = await prisma.article.delete({ where: { id } });
+    const { data: article, error } = await supabase
+      .from("Article")
+      .delete()
+      .eq("id", id)
+      .select("category")
+      .single();
+    if (error) throw error;
     revalidatePath("/");
     revalidatePath(`/${article.category}`);
     revalidatePath(`/admin/articles`);

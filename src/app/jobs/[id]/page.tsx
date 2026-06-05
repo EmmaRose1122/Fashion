@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { prisma } from "@/lib/prisma";
+import { supabase } from "@/lib/supabase";
 import { formatDate, parseTags } from "@/lib/utils";
 import { SITE_NAME, SITE_URL } from "@/lib/constants";
 import { TagBadge } from "@/components/ui/TagBadge";
@@ -14,9 +14,13 @@ interface JobDetailPageProps {
 
 export async function generateMetadata({ params }: JobDetailPageProps): Promise<Metadata> {
   const resolvedParams = await params;
-  const job = await prisma.job.findUnique({
-    where: { id: resolvedParams.id },
-  });
+  const job = (
+    await supabase
+      .from("Job")
+      .select("*")
+      .eq("id", resolvedParams.id)
+      .maybeSingle()
+  ).data;
 
   if (!job) return { title: "Not Found" };
 
@@ -36,9 +40,14 @@ export async function generateMetadata({ params }: JobDetailPageProps): Promise<
 
 export default async function JobDetailPage({ params }: JobDetailPageProps) {
   const resolvedParams = await params;
-  const job = await prisma.job.findUnique({
-    where: { id: resolvedParams.id, active: true },
-  });
+  const job = (
+    await supabase
+      .from("Job")
+      .select("*")
+      .eq("id", resolvedParams.id)
+      .eq("active", true)
+      .maybeSingle()
+  ).data;
 
   if (!job) notFound();
 
@@ -50,8 +59,8 @@ export default async function JobDetailPage({ params }: JobDetailPageProps) {
     "@type": "JobPosting",
     "title": job.title,
     "description": job.description,
-    "datePosted": job.createdAt.toISOString(),
-    "validThrough": new Date(job.createdAt.getTime() + 60 * 24 * 60 * 60 * 1000).toISOString(), // 60 days fallback
+    "datePosted": new Date(job.createdAt).toISOString(),
+    "validThrough": new Date(new Date(job.createdAt).getTime() + 60 * 24 * 60 * 60 * 1000).toISOString(), // 60 days fallback
     "employmentType": job.type ? job.type.toUpperCase().replace("-", "_") : "FULL_TIME",
     "hiringOrganization": {
       "@type": "Organization",

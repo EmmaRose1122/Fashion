@@ -1,20 +1,25 @@
 import Link from "next/link";
-import { prisma } from "@/lib/prisma";
+import { supabase } from "@/lib/supabase";
 
 export const revalidate = 0;
 
 export default async function AdminDashboardOverview() {
   const [
-    totalArticles,
-    publishedArticles,
-    totalJobs,
-    activeJobs
+    totalArticlesRes,
+    publishedArticlesRes,
+    totalJobsRes,
+    activeJobsRes
   ] = await Promise.all([
-    prisma.article.count(),
-    prisma.article.count({ where: { published: true } }),
-    prisma.job.count(),
-    prisma.job.count({ where: { active: true } })
+    supabase.from("Article").select("*", { count: "exact", head: true }),
+    supabase.from("Article").select("*", { count: "exact", head: true }).eq("published", true),
+    supabase.from("Job").select("*", { count: "exact", head: true }),
+    supabase.from("Job").select("*", { count: "exact", head: true }).eq("active", true)
   ]);
+
+  const totalArticles = totalArticlesRes.count || 0;
+  const publishedArticles = publishedArticlesRes.count || 0;
+  const totalJobs = totalJobsRes.count || 0;
+  const activeJobs = activeJobsRes.count || 0;
 
   return (
     <div className="space-y-12">

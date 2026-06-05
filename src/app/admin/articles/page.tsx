@@ -1,14 +1,17 @@
 import Link from "next/link";
-import { prisma } from "@/lib/prisma";
+import { supabase } from "@/lib/supabase";
 import { formatDate } from "@/lib/utils";
 import { deleteArticle } from "@/actions/articles";
 
 export const revalidate = 0;
 
 export default async function AdminArticlesListPage() {
-  const articles = await prisma.article.findMany({
-    orderBy: { createdAt: "desc" },
-  });
+  const articles = (
+    await supabase
+      .from("Article")
+      .select("*")
+      .order("createdAt", { ascending: false })
+  ).data || [];
 
   return (
     <div className="space-y-8 text-left">

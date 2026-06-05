@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { prisma } from "@/lib/prisma";
+import { supabase } from "@/lib/supabase";
 import { formatDate, parseTags } from "@/lib/utils";
 import { SITE_NAME, SITE_URL } from "@/lib/constants";
 import { TagBadge } from "@/components/ui/TagBadge";
@@ -15,9 +15,14 @@ interface ArticlePageProps {
 
 export async function generateMetadata({ params }: ArticlePageProps): Promise<Metadata> {
   const resolvedParams = await params;
-  const article = await prisma.article.findUnique({
-    where: { slug: resolvedParams.slug, category: "beauty" },
-  });
+  const article = (
+    await supabase
+      .from("Article")
+      .select("*")
+      .eq("slug", resolvedParams.slug)
+      .eq("category", "beauty")
+      .maybeSingle()
+  ).data;
 
   if (!article) return { title: "Not Found" };
 
@@ -38,9 +43,15 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
 
 export default async function BeautyArticlePage({ params }: ArticlePageProps) {
   const resolvedParams = await params;
-  const article = await prisma.article.findUnique({
-    where: { slug: resolvedParams.slug, category: "beauty", published: true },
-  });
+  const article = (
+    await supabase
+      .from("Article")
+      .select("*")
+      .eq("slug", resolvedParams.slug)
+      .eq("category", "beauty")
+      .eq("published", true)
+      .maybeSingle()
+  ).data;
 
   if (!article) notFound();
 
@@ -52,8 +63,8 @@ export default async function BeautyArticlePage({ params }: ArticlePageProps) {
     "@type": "NewsArticle",
     "headline": article.title,
     "image": article.thumbnail ? [article.thumbnail] : [],
-    "datePublished": article.createdAt.toISOString(),
-    "dateModified": article.updatedAt.toISOString(),
+    "datePublished": new Date(article.createdAt).toISOString(),
+    "dateModified": new Date(article.updatedAt).toISOString(),
     "author": [{
       "@type": "Person",
       "name": article.author,

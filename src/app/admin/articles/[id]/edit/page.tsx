@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { prisma } from "@/lib/prisma";
+import { supabase } from "@/lib/supabase";
 import { ArticleForm } from "@/components/admin/ArticleForm";
 
 export const revalidate = 0;
@@ -10,9 +10,13 @@ interface EditArticlePageProps {
 
 export default async function EditArticlePage({ params }: EditArticlePageProps) {
   const resolvedParams = await params;
-  const article = await prisma.article.findUnique({
-    where: { id: resolvedParams.id },
-  });
+  const article = (
+    await supabase
+      .from("Article")
+      .select("*")
+      .eq("id", resolvedParams.id)
+      .maybeSingle()
+  ).data;
 
   if (!article) notFound();
 

@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { prisma } from "@/lib/prisma";
+import { supabase } from "@/lib/supabase";
 
 export type JobActionState = {
   error?: string;
@@ -34,20 +34,19 @@ export async function createJob(
   const tags = JSON.stringify(tagsArray);
 
   try {
-    await prisma.job.create({
-      data: {
-        title,
-        company,
-        location: location || null,
-        type: type || null,
-        salary: salary || null,
-        description,
-        applyLink,
-        tags,
-        active,
-        featured,
-      },
+    const { error } = await supabase.from("Job").insert({
+      title,
+      company,
+      location: location || null,
+      type: type || null,
+      salary: salary || null,
+      description,
+      applyLink,
+      tags,
+      active,
+      featured,
     });
+    if (error) throw error;
   } catch (err) {
     console.error("Failed to create job:", err);
     return { error: "Database error. Failed to create job." };
@@ -85,9 +84,9 @@ export async function updateJob(
   const tags = JSON.stringify(tagsArray);
 
   try {
-    await prisma.job.update({
-      where: { id },
-      data: {
+    const { error } = await supabase
+      .from("Job")
+      .update({
         title,
         company,
         location: location || null,
@@ -98,8 +97,9 @@ export async function updateJob(
         tags,
         active,
         featured,
-      },
-    });
+      })
+      .eq("id", id);
+    if (error) throw error;
   } catch (err) {
     console.error("Failed to update job:", err);
     return { error: "Database error. Failed to update job." };
@@ -114,7 +114,8 @@ export async function updateJob(
 
 export async function deleteJob(id: string) {
   try {
-    await prisma.job.delete({ where: { id } });
+    const { error } = await supabase.from("Job").delete().eq("id", id);
+    if (error) throw error;
     revalidatePath("/");
     revalidatePath("/jobs");
     revalidatePath("/admin/jobs");

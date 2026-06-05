@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { prisma } from "@/lib/prisma";
+import { supabase } from "@/lib/supabase";
 import { ArticleCard } from "@/components/ui/ArticleCard";
 import { JobCard } from "@/components/ui/JobCard";
 import { formatDate } from "@/lib/utils";
@@ -10,30 +10,53 @@ export const revalidate = 0;
 
 export default async function HomePage() {
   // Fetch featured article
-  const featuredArticle = await prisma.article.findFirst({
-    where: { published: true, featured: true },
-    orderBy: { createdAt: "desc" },
-  }) || await prisma.article.findFirst({
-    where: { published: true },
-    orderBy: { createdAt: "desc" },
-  });
+  let featuredArticle = (
+    await supabase
+      .from("Article")
+      .select("*")
+      .eq("published", true)
+      .eq("featured", true)
+      .order("createdAt", { ascending: false })
+      .limit(1)
+      .maybeSingle()
+  ).data;
+
+  if (!featuredArticle) {
+    featuredArticle = (
+      await supabase
+        .from("Article")
+        .select("*")
+        .eq("published", true)
+        .order("createdAt", { ascending: false })
+        .limit(1)
+        .maybeSingle()
+    ).data;
+  }
 
   // Fetch latest articles (excluding the featured one if it exists)
-  const latestArticles = await prisma.article.findMany({
-    where: {
-      published: true,
-      id: featuredArticle ? { not: featuredArticle.id } : undefined,
-    },
-    orderBy: { createdAt: "desc" },
-    take: 6,
-  });
+  let latestArticlesQuery = supabase
+    .from("Article")
+    .select("*")
+    .eq("published", true)
+    .order("createdAt", { ascending: false })
+    .limit(6);
+
+  if (featuredArticle) {
+    latestArticlesQuery = latestArticlesQuery.neq("id", featuredArticle.id);
+  }
+
+  const latestArticles = (await latestArticlesQuery).data || [];
 
   // Fetch featured jobs
-  const featuredJobs = await prisma.job.findMany({
-    where: { active: true, featured: true },
-    orderBy: { createdAt: "desc" },
-    take: 3,
-  });
+  const featuredJobs = (
+    await supabase
+      .from("Job")
+      .select("*")
+      .eq("active", true)
+      .eq("featured", true)
+      .order("createdAt", { ascending: false })
+      .limit(3)
+  ).data || [];
 
   return (
     <div className="space-y-24 pb-24">

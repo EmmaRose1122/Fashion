@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { prisma } from "@/lib/prisma";
+import { supabase } from "@/lib/supabase";
 import { ArticleCard } from "@/components/ui/ArticleCard";
 import { Pagination } from "@/components/ui/Pagination";
 import { ARTICLES_PER_PAGE, CATEGORIES } from "@/lib/constants";
@@ -26,18 +26,28 @@ export default async function FashionCategoryPage({ searchParams }: CategoryPage
   const resolvedParams = await searchParams;
   const currentPage = Number(resolvedParams.page) || 1;
 
-  const totalArticles = await prisma.article.count({
-    where: { category: "fashion", published: true },
-  });
+  const totalArticles = (
+    await supabase
+      .from("Article")
+      .select("*", { count: "exact", head: true })
+      .eq("category", "fashion")
+      .eq("published", true)
+  ).count || 0;
 
   const totalPages = Math.ceil(totalArticles / ARTICLES_PER_PAGE);
 
-  const articles = await prisma.article.findMany({
-    where: { category: "fashion", published: true },
-    orderBy: { createdAt: "desc" },
-    skip: (currentPage - 1) * ARTICLES_PER_PAGE,
-    take: ARTICLES_PER_PAGE,
-  });
+  const from = (currentPage - 1) * ARTICLES_PER_PAGE;
+  const to = from + ARTICLES_PER_PAGE - 1;
+
+  const articles = (
+    await supabase
+      .from("Article")
+      .select("*")
+      .eq("category", "fashion")
+      .eq("published", true)
+      .order("createdAt", { ascending: false })
+      .range(from, to)
+  ).data || [];
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-12 md:py-20 space-y-16">

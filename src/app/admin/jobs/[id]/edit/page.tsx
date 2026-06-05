@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { prisma } from "@/lib/prisma";
+import { supabase } from "@/lib/supabase";
 import { JobForm } from "@/components/admin/JobForm";
 
 export const revalidate = 0;
@@ -10,9 +10,13 @@ interface EditJobPageProps {
 
 export default async function EditJobPage({ params }: EditJobPageProps) {
   const resolvedParams = await params;
-  const job = await prisma.job.findUnique({
-    where: { id: resolvedParams.id },
-  });
+  const job = (
+    await supabase
+      .from("Job")
+      .select("*")
+      .eq("id", resolvedParams.id)
+      .maybeSingle()
+  ).data;
 
   if (!job) notFound();
 

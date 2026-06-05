@@ -1,14 +1,17 @@
 import Link from "next/link";
-import { prisma } from "@/lib/prisma";
+import { supabase } from "@/lib/supabase";
 import { formatDate } from "@/lib/utils";
 import { deleteJob } from "@/actions/jobs";
 
 export const revalidate = 0;
 
 export default async function AdminJobsListPage() {
-  const jobs = await prisma.job.findMany({
-    orderBy: { createdAt: "desc" },
-  });
+  const jobs = (
+    await supabase
+      .from("Job")
+      .select("*")
+      .order("createdAt", { ascending: false })
+  ).data || [];
 
   return (
     <div className="space-y-8 text-left">
