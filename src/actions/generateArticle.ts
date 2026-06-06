@@ -81,6 +81,32 @@ async function callAIProvider(
         return data.content[0]?.text || "";
     }
 
+    if (provider === "openrouter") {
+        const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${apiKey}`,
+                "HTTP-Referer": "https://fashionworldhub.vercel.app",
+                "X-Title": "LUXE Editorial",
+            },
+            body: JSON.stringify({
+                model: model || "openai/gpt-4-turbo",
+                messages,
+                temperature: 0.7,
+                max_tokens: 4000,
+            }),
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error?.message || "OpenRouter API error");
+        }
+
+        const data = await response.json();
+        return data.choices[0]?.message?.content || "";
+    }
+
     if (provider === "custom" && customBaseUrl) {
         const response = await fetch(`${customBaseUrl.replace(/\/$/, "")}/chat/completions`, {
             method: "POST",

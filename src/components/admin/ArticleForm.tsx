@@ -23,7 +23,7 @@ export function ArticleForm() {
 
     // AI Generation state
     const [apiKey, setApiKey] = useState("");
-    const [provider, setProvider] = useState<"openai" | "anthropic" | "custom">("openai");
+    const [provider, setProvider] = useState<"openai" | "anthropic" | "openrouter" | "custom">("openai");
     const [customBaseUrl, setCustomBaseUrl] = useState("");
     const [model, setModel] = useState("");
     const [prompt, setPrompt] = useState("");
@@ -186,11 +186,12 @@ insight. Articles should feel curated, not generated.`
                             </label>
                             <select
                                 value={provider}
-                                onChange={(e) => setProvider(e.target.value as "openai" | "anthropic" | "custom")}
+                                onChange={(e) => setProvider(e.target.value as "openai" | "anthropic" | "openrouter" | "custom")}
                                 className="w-full px-4 py-2 border border-border rounded-lg bg-surface text-text-primary focus:ring-2 focus:ring-accent focus:border-accent"
                             >
                                 <option value="openai">OpenAI</option>
                                 <option value="anthropic">Anthropic (Claude)</option>
+                                <option value="openrouter">OpenRouter</option>
                                 <option value="custom">Custom / Longcat</option>
                             </select>
                         </div>
@@ -203,7 +204,12 @@ insight. Articles should feel curated, not generated.`
                                 type="text"
                                 value={model}
                                 onChange={(e) => setModel(e.target.value)}
-                                placeholder={provider === "openai" ? "gpt-4-turbo-preview" : provider === "anthropic" ? "claude-3-opus-20240229" : "model-name"}
+                                placeholder={
+                                    provider === "openai" ? "gpt-4-turbo-preview" :
+                                        provider === "anthropic" ? "claude-3-opus-20240229" :
+                                            provider === "openrouter" ? "openai/gpt-4-turbo, anthropic/claude-3-opus, meta-llama/llama-3-70b" :
+                                                "model-name"
+                                }
                                 className="w-full px-4 py-2 border border-border rounded-lg bg-surface text-text-primary focus:ring-2 focus:ring-accent focus:border-accent"
                             />
                         </div>
