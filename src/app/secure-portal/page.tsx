@@ -8,6 +8,7 @@ import { CrownIcon } from "@/components/ui/CrownIcon";
 export default function SecurePortalPage() {
     const [state, action, isPending] = useActionState(login, undefined);
     const [showPassword, setShowPassword] = useState(false);
+    const [showHint, setShowHint] = useState(false);
 
     return (
         <div className="flex-1 flex items-center justify-center bg-background px-6 py-20 min-h-[80vh] relative overflow-hidden">
@@ -85,9 +86,14 @@ export default function SecurePortalPage() {
                         </div>
 
                         {state?.error && (
-                            <p className="text-xs text-red-500 font-medium bg-red-50 border border-red-100 p-3 rounded-sm">
-                                {state.error}
-                            </p>
+                            <div className="space-y-2">
+                                <p className="text-xs text-red-500 font-medium bg-red-50 border border-red-100 p-3 rounded-sm">
+                                    {state.error}
+                                </p>
+                                <p className="text-[10px] text-text-secondary/70 italic">
+                                    Tip: hard-refresh the page (Ctrl+Shift+R) to clear stale cache after a redeploy.
+                                </p>
+                            </div>
                         )}
 
                         <button
@@ -99,13 +105,30 @@ export default function SecurePortalPage() {
                         </button>
                     </form>
 
-                    <div className="pt-4 border-t border-border-light space-y-2">
-                        <p className="text-[10px] uppercase tracking-widest text-text-secondary/60 font-semibold">
-                            Restricted Access
-                        </p>
-                        <p className="text-xs text-text-secondary/70 leading-relaxed">
-                            This portal is reserved for authorised editorial staff only. All access attempts are logged.
-                        </p>
+                    <div className="pt-4 border-t border-border-light space-y-3">
+                        <button
+                            type="button"
+                            onClick={() => setShowHint((s) => !s)}
+                            className="text-[10px] uppercase tracking-widest text-text-secondary hover:text-accent font-bold transition-colors"
+                        >
+                            {showHint ? "− Hide" : "+ Show"} default credentials hint
+                        </button>
+                        {showHint && (
+                            <div className="text-[10px] text-text-secondary/80 leading-relaxed text-left space-y-1.5 bg-background/50 border border-border-light rounded-sm p-3">
+                                <p>
+                                    <strong className="text-text-primary">Default email:</strong>{" "}
+                                    <code className="font-mono">editor@fashionhub.studio</code>
+                                </p>
+                                <p>
+                                    <strong className="text-text-primary">Default password:</strong>{" "}
+                                    <code className="font-mono">FH-Curated-2026!Lux-Quiet</code>
+                                </p>
+                                <p className="italic pt-1">
+                                    Override via <code className="font-mono">ADMIN_EMAIL</code> and{" "}
+                                    <code className="font-mono">ADMIN_PASSWORD</code> env vars.
+                                </p>
+                            </div>
+                        )}
                     </div>
                 </div>
 
