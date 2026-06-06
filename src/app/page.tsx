@@ -3,11 +3,10 @@ import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 import { ArticleCard } from "@/components/ui/ArticleCard";
 import { Marquee } from "@/components/ui/Marquee";
-import { CrownIcon } from "@/components/ui/CrownIcon";
 import { AnimatedSection } from "@/components/ui/AnimatedSection";
 import { TextReveal } from "@/components/ui/TextReveal";
 import { formatDate } from "@/lib/utils";
-import { CATEGORIES } from "@/lib/constants";
+import { CATEGORIES, SITE_NAME } from "@/lib/constants";
 
 export const revalidate = 0;
 
@@ -64,108 +63,109 @@ export default async function HomePage() {
 
   return (
     <div className="pb-24">
-      <section className="relative overflow-hidden border-b border-border-light">
-        <div
-          className="absolute -top-32 -right-32 w-[480px] h-[480px] rounded-full opacity-30 blur-3xl pointer-events-none animate-float"
-          style={{ background: "radial-gradient(circle, rgba(201,169,110,0.45) 0%, rgba(201,169,110,0) 70%)" }}
-          aria-hidden="true"
-        />
-        <div
-          className="absolute -bottom-32 -left-32 w-[420px] h-[420px] rounded-full opacity-25 blur-3xl pointer-events-none animate-float"
-          style={{ background: "radial-gradient(circle, rgba(184,150,62,0.4) 0%, rgba(184,150,62,0) 70%)", animationDelay: "2s" }}
-          aria-hidden="true"
-        />
-
-        <div className="relative max-w-7xl mx-auto px-6 pt-16 md:pt-24 pb-16 md:pb-20">
-          <div className="flex items-center justify-center gap-3 text-[10px] uppercase tracking-[0.4em] text-accent font-bold mb-8 animate-fade-down">
-            <span className="inline-block w-8 h-px bg-accent/60" />
-            <CrownIcon size={14} className="text-accent" />
-            <span>Issue No. 01 &middot; 2026</span>
-            <CrownIcon size={14} className="text-accent" />
-            <span className="inline-block w-8 h-px bg-accent/60" />
+      {/* ============================================
+          HERO
+          ============================================ */}
+      <section className="relative overflow-hidden border-b border-border">
+        <div className="max-w-7xl mx-auto px-6 pt-20 md:pt-32 pb-20 md:pb-28 text-center">
+          <div
+            className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.4em] text-accent font-bold mb-10 animate-fade-down"
+            style={{ animationDelay: "0.1s" }}
+          >
+            <span className="inline-block w-6 h-px bg-accent" />
+            <span>Issue No. 01 · Spring 2026</span>
+            <span className="inline-block w-6 h-px bg-accent" />
           </div>
 
           <TextReveal
             as="h1"
-            className="text-center font-heading text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold leading-[0.95] tracking-tight max-w-5xl mx-auto"
-            duration={1100}
+            className="font-heading text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-semibold leading-[0.95] tracking-[-0.03em] max-w-5xl mx-auto"
+            duration={1200}
             delay={120}
           >
-            Quiet stories.{" "}
-            <span className="italic font-medium text-accent">Quietly</span> luxurious.
+            The quiet art of{" "}
+            <span className="font-display italic font-normal text-accent">looking</span>{" "}
+            good.
           </TextReveal>
 
           <TextReveal
             as="p"
-            className="text-center text-base md:text-lg text-text-secondary leading-relaxed max-w-2xl mx-auto mt-8"
-            delay={320}
+            className="text-base md:text-lg text-text-secondary leading-relaxed max-w-xl mx-auto mt-10"
+            delay={400}
             duration={900}
           >
-            An editorial journal of fashion, beauty, lifestyle, and curated stories
-            for the modern woman &mdash; written slowly, read deliberately.
+            An editorial journal of fashion, beauty, wellness, and home —
+            for the modern woman who chooses substance over spectacle.
           </TextReveal>
 
           <div
-            className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-10"
-            style={{ animation: "fade-up 0.9s cubic-bezier(0.22,1,0.36,1) 0.6s both" }}
+            className="flex flex-col sm:flex-row items-center justify-center gap-5 pt-12"
+            style={{ animation: "fade-up 1s cubic-bezier(0.22,1,0.36,1) 0.7s both" }}
           >
             <Link
               href="/fashion"
-              className="group inline-flex items-center gap-3 text-xs uppercase tracking-widest bg-text-primary hover:bg-accent text-white px-8 py-4 rounded-sm font-semibold transition-all duration-300 hover:shadow-xl hover:shadow-accent/20"
+              className="text-xs uppercase tracking-[0.2em] bg-text-primary hover:bg-accent text-white px-10 py-5 font-semibold transition-colors"
             >
-              <CrownIcon size={14} className="text-accent group-hover:text-white transition-colors" />
-              Read Latest Issue
+              Read the Journal
             </Link>
             <Link
               href="#latest"
-              className="group inline-flex items-center gap-2 text-xs uppercase tracking-widest text-text-primary border-b-2 border-accent pb-1 font-semibold transition-all hover:text-accent"
+              className="gold-underline text-xs uppercase tracking-[0.2em] text-text-primary hover:text-accent font-semibold pb-1 transition-colors"
             >
-              Browse the Journal
-              <span className="inline-block transition-transform duration-300 group-hover:translate-x-1">&rarr;</span>
+              Latest Stories
             </Link>
           </div>
 
           <div
-            className="grid grid-cols-3 gap-4 md:gap-12 pt-16 max-w-3xl mx-auto border-t border-border-light mt-16"
-            style={{ animation: "fade-up 0.9s cubic-bezier(0.22,1,0.36,1) 0.9s both" }}
+            className="grid grid-cols-3 gap-4 md:gap-16 pt-20 max-w-3xl mx-auto border-t border-border mt-20"
+            style={{ animation: "fade-up 1s cubic-bezier(0.22,1,0.36,1) 1s both" }}
           >
             {[
-              { num: "6", label: "Editorial Sections" },
-              { num: "100+", label: "Curated Stories" },
-              { num: "Weekly", label: "New Features" },
+              { num: "6", label: "Sections" },
+              { num: "∞", label: "Curated Stories" },
+              { num: "Wk", label: "New Issues" },
             ].map((s) => (
               <div key={s.label} className="text-center space-y-1">
-                <p className="font-heading text-3xl md:text-5xl font-bold text-text-primary">{s.num}</p>
-                <p className="text-[10px] uppercase tracking-[0.3em] text-text-secondary font-semibold">{s.label}</p>
+                <p className="font-display text-4xl md:text-6xl italic text-text-primary">
+                  {s.num}
+                </p>
+                <p className="text-[10px] uppercase tracking-[0.3em] text-text-secondary font-semibold">
+                  {s.label}
+                </p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="py-8 border-b border-border-light bg-background overflow-hidden">
+      {/* ============================================
+          MARQUEE
+          ============================================ */}
+      <section className="py-10 border-b border-border bg-surface overflow-hidden">
         <Marquee speed="slow" className="py-2">
           {CATEGORIES.map((cat) => (
             <Link
               key={cat.slug}
               href={`/${cat.slug}`}
-              className="group flex items-center gap-3 text-2xl md:text-3xl font-heading font-bold text-text-primary/30 hover:text-accent transition-colors duration-500"
+              className="group flex items-center gap-4 text-2xl md:text-3xl font-display italic text-text-primary/40 hover:text-accent transition-colors duration-500"
             >
-              <CrownIcon size={18} className="text-accent opacity-50 group-hover:opacity-100 transition-opacity" />
               <span className="tracking-tight">{cat.name}</span>
-              <span className="text-accent/50 mx-2">&starf;</span>
+              <span className="text-accent/60 mx-3">✦</span>
             </Link>
           ))}
         </Marquee>
       </section>
 
+      {/* ============================================
+          FEATURED
+          ============================================ */}
       {featuredArticle && (
-        <AnimatedSection className="max-w-7xl mx-auto px-6 pt-20 md:pt-28" threshold={0.05}>
+        <AnimatedSection className="max-w-7xl mx-auto px-6 pt-24 md:pt-32" threshold={0.05}>
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-center">
             <div className="lg:col-span-7 group">
               <Link
                 href={`/${featuredArticle.category}/${featuredArticle.slug}`}
-                className="block relative aspect-[16/10] overflow-hidden bg-border-light rounded-sm"
+                className="block relative aspect-[4/5] overflow-hidden bg-border-light"
               >
                 {featuredArticle.thumbnail ? (
                   <Image
@@ -174,44 +174,50 @@ export default async function HomePage() {
                     fill
                     priority
                     sizes="(max-width: 1024px) 100vw, 60vw"
-                    className="object-cover transition-transform duration-[1.4s] ease-out group-hover:scale-105"
+                    className="object-cover transition-transform duration-[1.6s] ease-out group-hover:scale-[1.05]"
                   />
                 ) : (
                   <div className="absolute inset-0 flex items-center justify-center bg-border-light text-text-secondary text-sm uppercase tracking-widest">
                     {featuredArticle.category}
                   </div>
                 )}
-                <div className="absolute top-4 left-4 inline-flex items-center gap-1.5 bg-accent text-white text-[9px] uppercase tracking-widest px-3 py-1.5 rounded-sm font-bold">
-                  <CrownIcon size={10} className="text-white" />
-                  Featured
+                <div className="absolute top-6 left-6">
+                  <span className="inline-flex items-center gap-1.5 bg-accent text-white text-[9px] uppercase tracking-[0.3em] px-3 py-1.5 font-bold">
+                    Featured
+                  </span>
                 </div>
               </Link>
             </div>
 
             <div className="lg:col-span-5 flex flex-col space-y-6 text-left">
-              <div className="flex items-center space-x-2 text-[10px] uppercase tracking-widest text-accent font-bold">
+              <div className="flex items-center space-x-2 text-[10px] uppercase tracking-[0.3em] text-accent font-bold">
                 <span className="capitalize">{featuredArticle.category.replace("-", " ")}</span>
-                <span className="text-border">&bull;</span>
+                <span className="text-border">·</span>
                 <span className="text-text-secondary font-medium">{formatDate(featuredArticle.createdAt)}</span>
               </div>
 
-              <div className="space-y-4">
-                <Link href={`/${featuredArticle.category}/${featuredArticle.slug}`} className="block group">
-                  <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-bold leading-tight transition-colors duration-300 group-hover:text-accent">
+              <div className="space-y-5">
+                <Link
+                  href={`/${featuredArticle.category}/${featuredArticle.slug}`}
+                  className="block group"
+                >
+                  <h2 className="font-heading text-4xl md:text-5xl lg:text-6xl font-semibold leading-[1.05] tracking-[-0.02em] transition-colors duration-300 group-hover:text-accent">
                     {featuredArticle.title}
                   </h2>
                 </Link>
                 {featuredArticle.excerpt && (
-                  <p className="text-base text-text-secondary leading-relaxed">{featuredArticle.excerpt}</p>
+                  <p className="font-display italic text-lg md:text-xl text-text-secondary leading-relaxed">
+                    {featuredArticle.excerpt}
+                  </p>
                 )}
               </div>
 
               <div className="pt-2">
                 <Link
                   href={`/${featuredArticle.category}/${featuredArticle.slug}`}
-                  className="gold-underline text-xs uppercase tracking-widest text-text-primary hover:text-accent font-bold pb-1 transition-colors"
+                  className="gold-underline text-xs uppercase tracking-[0.2em] text-text-primary hover:text-accent font-bold pb-1 transition-colors"
                 >
-                  Read Editorial &rarr;
+                  Read the Story →
                 </Link>
               </div>
             </div>
@@ -219,14 +225,21 @@ export default async function HomePage() {
         </AnimatedSection>
       )}
 
+      {/* ============================================
+          CATEGORIES
+          ============================================ */}
       <section className="max-w-7xl mx-auto px-6 pt-24 md:pt-32 space-y-12">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-border-light pb-6 text-left">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-border pb-6 text-left">
           <div className="space-y-2">
-            <span className="text-[10px] uppercase tracking-[0.4em] text-accent font-bold">Explore</span>
-            <h2 className="text-3xl md:text-5xl font-bold font-heading tracking-tight">Browse by Section</h2>
+            <span className="text-[10px] uppercase tracking-[0.4em] text-accent font-bold">
+              Sections
+            </span>
+            <h2 className="text-4xl md:text-5xl font-heading font-semibold tracking-[-0.02em]">
+              Browse by Section
+            </h2>
           </div>
-          <p className="text-xs text-text-secondary max-w-md">
-            Six curated editorial spaces &mdash; each crafted with intention, designed to inspire.
+          <p className="text-sm text-text-secondary max-w-sm font-display italic">
+            Six curated spaces — each crafted with intention.
           </p>
         </div>
 
@@ -235,13 +248,17 @@ export default async function HomePage() {
             <Link
               key={cat.slug}
               href={`/${cat.slug}`}
-              className="hover-lift group relative overflow-hidden bg-surface border border-border hover:border-accent transition-all rounded-sm p-6 flex flex-col items-start justify-between min-h-[170px]"
+              className="hover-lift group relative overflow-hidden bg-surface border border-border hover:border-accent transition-all p-6 flex flex-col items-start justify-between min-h-[180px]"
             >
-              <CrownIcon size={18} className="text-accent opacity-60 group-hover:opacity-100 group-hover:rotate-12 transition-all duration-500" />
+              <span className="text-[10px] uppercase tracking-[0.3em] text-accent/70 group-hover:text-accent font-bold">
+                Section
+              </span>
               <div className="space-y-1">
-                <h3 className="font-heading text-lg md:text-xl font-bold group-hover:text-accent transition-colors">{cat.name}</h3>
-                <span className="text-[10px] text-text-secondary/60 font-medium uppercase tracking-widest">
-                  {categoryArticles[cat.slug]?.length || 0} {categoryArticles[cat.slug]?.length === 1 ? "story" : "stories"} &rarr;
+                <h3 className="font-heading text-lg md:text-xl font-semibold group-hover:text-accent transition-colors">
+                  {cat.name}
+                </h3>
+                <span className="text-[10px] text-text-secondary/60 font-medium uppercase tracking-[0.2em]">
+                  {categoryArticles[cat.slug]?.length || 0} {categoryArticles[cat.slug]?.length === 1 ? "story" : "stories"} →
                 </span>
               </div>
               <span
@@ -253,20 +270,27 @@ export default async function HomePage() {
         </AnimatedSection>
       </section>
 
+      {/* ============================================
+          LATEST STORIES
+          ============================================ */}
       <section id="latest" className="max-w-7xl mx-auto px-6 pt-24 md:pt-32 space-y-12 scroll-mt-24">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-border-light pb-6 text-left">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-border pb-6 text-left">
           <div className="space-y-2">
-            <span className="text-[10px] uppercase tracking-[0.4em] text-accent font-bold">The Journal</span>
-            <h2 className="text-3xl md:text-5xl font-bold font-heading tracking-tight">Latest Stories</h2>
+            <span className="text-[10px] uppercase tracking-[0.4em] text-accent font-bold">
+              The Journal
+            </span>
+            <h2 className="text-4xl md:text-5xl font-heading font-semibold tracking-[-0.02em]">
+              Latest Stories
+            </h2>
           </div>
-          <div className="flex flex-wrap gap-x-5 gap-y-2">
+          <div className="flex flex-wrap gap-x-6 gap-y-2">
             {CATEGORIES.slice(0, 3).map((cat) => (
               <Link
                 key={cat.slug}
                 href={`/${cat.slug}`}
-                className="text-xs uppercase tracking-widest text-text-secondary hover:text-accent gold-underline transition-colors font-semibold"
+                className="gold-underline text-[11px] uppercase tracking-[0.2em] text-text-secondary hover:text-accent font-semibold transition-colors"
               >
-                {cat.name} &rarr;
+                {cat.name} →
               </Link>
             ))}
           </div>
@@ -280,28 +304,37 @@ export default async function HomePage() {
           </AnimatedSection>
         ) : (
           <div className="py-24 border border-dashed border-border text-center text-text-secondary text-sm">
-            No articles found. Check back later or add content via the studio dashboard.
+            <p className="font-display italic text-base mb-2">No stories yet.</p>
+            <p>The journal is being prepared. Check back soon.</p>
           </div>
         )}
       </section>
 
-      <section className="max-w-5xl mx-auto px-6 pt-24 md:pt-32 text-center space-y-8">
-        <CrownIcon size={36} className="text-accent mx-auto animate-float" />
+      {/* ============================================
+          MANIFESTO
+          ============================================ */}
+      <section className="max-w-4xl mx-auto px-6 pt-32 md:pt-40 text-center space-y-8">
+        <div className="inline-block w-12 h-px bg-accent" />
         <TextReveal
           as="h2"
-          className="font-heading text-3xl md:text-5xl lg:text-6xl font-bold leading-[1.05] tracking-tight shimmer-text"
+          className="font-display italic text-4xl md:text-6xl lg:text-7xl leading-[1.05] shimmer-text"
         >
           Style is a quiet language.
         </TextReveal>
-        <TextReveal as="p" delay={200} className="text-base md:text-lg text-text-secondary leading-relaxed max-w-2xl mx-auto">
-          At Fashion Hub, we believe in the slow craft of looking good. No noise. No trends for the sake of trends.
-          Just considered stories, beautiful writing, and a community of women who choose substance over spectacle.
+        <TextReveal
+          as="p"
+          delay={200}
+          className="text-base md:text-lg text-text-secondary leading-relaxed max-w-2xl mx-auto font-display italic"
+        >
+          At {SITE_NAME}, we believe in the slow craft of looking good. No noise. No trends
+          for the sake of trends. Just considered stories, beautiful writing, and a
+          community of women who choose substance over spectacle.
         </TextReveal>
-        <div className="pt-4 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[10px] uppercase tracking-[0.3em] text-text-secondary font-semibold">
+        <div className="pt-4 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[10px] uppercase tracking-[0.4em] text-text-secondary font-semibold">
           <span>Est. 2026</span>
-          <span className="text-accent">&starf;</span>
+          <span className="text-accent">✦</span>
           <span>Quiet Luxury</span>
-          <span className="text-accent">&starf;</span>
+          <span className="text-accent">✦</span>
           <span>Curated Editorial</span>
         </div>
       </section>

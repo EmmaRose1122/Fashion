@@ -1,57 +1,47 @@
 import Link from "next/link";
 import { Logo } from "@/components/ui/Logo";
-import { CrownIcon } from "@/components/ui/CrownIcon";
 
 export default function NotFound() {
     return (
         <div className="min-h-[80vh] flex items-center justify-center px-6 py-24 relative overflow-hidden">
-            {/* Decorative gradient */}
             <div
-                className="absolute -top-32 -right-32 w-[400px] h-[400px] rounded-full opacity-20 blur-3xl pointer-events-none animate-float"
+                className="absolute -top-32 -right-32 w-[400px] h-[400px] rounded-full opacity-25 blur-3xl pointer-events-none animate-float"
                 style={{
                     background:
-                        "radial-gradient(circle, rgba(201,169,110,0.5) 0%, rgba(201,169,110,0) 70%)",
+                        "radial-gradient(circle, rgba(181,70,92,0.4) 0%, rgba(181,70,92,0) 70%)",
                 }}
                 aria-hidden="true"
             />
+
             <div className="relative max-w-2xl text-center space-y-10">
-                <Logo size="lg" />
+                <div className="inline-block">
+                    <Logo size="lg" />
+                </div>
 
                 <div className="space-y-4">
-                    <CrownIcon
-                        size={48}
-                        className="text-accent mx-auto animate-float"
-                    />
-                    <h1 className="font-heading text-8xl md:text-9xl font-bold shimmer-text">
-                        404
-                    </h1>
                     <p className="text-[10px] uppercase tracking-[0.4em] text-accent font-bold">
                         Page Not Found
                     </p>
+                    <h1 className="font-display text-8xl md:text-9xl font-semibold shimmer-text">
+                        404
+                    </h1>
                 </div>
 
                 <div className="space-y-4 max-w-md mx-auto">
-                    <p className="text-base text-text-secondary leading-relaxed">
-                        The story you're looking for has moved, been retired, or perhaps never existed in our journal.
-                    </p>
-                    <p className="text-xs text-text-secondary/60 italic">
+                    <p className="font-display italic text-xl md:text-2xl text-text-primary leading-snug">
                         Even in quiet luxury, sometimes a page gracefully turns.
+                    </p>
+                    <p className="text-sm text-text-secondary leading-relaxed">
+                        The story you're looking for has moved, been retired, or never existed in our journal.
                     </p>
                 </div>
 
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
                     <Link
                         href="/"
-                        className="group inline-flex items-center gap-2 text-xs uppercase tracking-widest bg-text-primary hover:bg-accent text-white px-8 py-4 rounded-sm font-semibold transition-all duration-300 hover:shadow-xl hover:shadow-accent/20"
+                        className="text-xs uppercase tracking-[0.2em] bg-text-primary hover:bg-accent text-white px-8 py-4 font-semibold transition-colors"
                     >
-                        <CrownIcon size={12} className="text-accent group-hover:text-white transition-colors" />
-                        Return Home
-                    </Link>
-                    <Link
-                        href="/jobs"
-                        className="text-xs uppercase tracking-widest text-text-secondary hover:text-accent gold-underline font-semibold py-4 px-2 transition-colors"
-                    >
-                        Browse Careers →
+                        Return to Journal
                     </Link>
                 </div>
             </div>

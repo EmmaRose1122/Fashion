@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { SITE_URL, CATEGORIES } from "@/lib/constants";
+import { supabase } from "@/lib/supabase";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticUrls: MetadataRoute.Sitemap = [
@@ -18,17 +19,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   try {
-    // Dynamic import so the module isn't evaluated at build time when env vars may be absent
-    const { supabase } = await import("@/lib/supabase");
-
-    const articlesRes = await supabase
+    const { data: articles } = await supabase
       .from("Article")
       .select("slug, category, updatedAt")
       .eq("published", true);
 
-    const articles = articlesRes.data || [];
-
-    const articleUrls: MetadataRoute.Sitemap = articles.map((article) => ({
+    const articleUrls: MetadataRoute.Sitemap = (articles || []).map((article) => ({
       url: `${SITE_URL}/${article.category}/${article.slug}`,
       lastModified: article.updatedAt,
       changeFrequency: "weekly",
@@ -37,7 +33,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     return [...staticUrls, ...articleUrls];
   } catch {
-    // During build or when Supabase isn't configured, return only static URLs
     return staticUrls;
   }
 }

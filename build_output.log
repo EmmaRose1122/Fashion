@@ -1,54 +1,18 @@
 ﻿
-> fashion-beauty-jobs@1.0.0 build
+> luxe-editorial@2.0.0 build
 > next build
 
    Γû▓ Next.js 15.5.19
    - Environments: .env.local
 
    Creating an optimized production build ...
- Γ£ô Compiled successfully in 4.5s
+ Γ£ô Compiled successfully in 11.2s
    Linting and checking validity of types ...
    Collecting page data ...
-   Generating static pages (0/13) ...
-   Generating static pages (3/13) 
-   Generating static pages (6/13) 
-   Generating static pages (9/13) 
- Γ£ô Generating static pages (13/13)
+   Generating static pages (0/11) ...
+   Generating static pages (2/11) 
+   Generating static pages (5/11) 
+   Generating static pages (8/11) 
+ Γ£ô Generating static pages (11/11)
    Finalizing page optimization ...
    Collecting build traces ...
-
-Route (app)                                 Size  First Load JS
-Γöî ╞Æ /                                    1.07 kB         112 kB
-Γö£ ╞Æ /_not-found                            133 B         103 kB
-Γö£ ΓùÅ /[category]                            174 B         111 kB
-Γö£   Γö£ /fashion
-Γö£   Γö£ /beauty
-Γö£   Γö£ /nail-design
-Γö£   Γöö [+3 more paths]
-Γö£ ╞Æ /[category]/[slug]                     173 B         111 kB
-Γö£ ╞Æ /admin                                 173 B         106 kB
-Γö£ ╞Æ /admin/articles                        173 B         106 kB
-Γö£ ╞Æ /admin/articles/[id]/edit            3.09 kB         114 kB
-Γö£ ╞Æ /admin/articles/new                  3.08 kB         114 kB
-Γö£ ╞Æ /admin/header                         3.1 kB         106 kB
-Γö£ ╞Æ /admin/jobs                            173 B         106 kB
-Γö£ ╞Æ /admin/jobs/[id]/edit                2.31 kB         108 kB
-Γö£ ╞Æ /admin/jobs/new                      2.29 kB         108 kB
-Γö£ ╞Æ /jobs                                  164 B         106 kB
-Γö£ ╞Æ /jobs/[id]                             173 B         106 kB
-Γö£ Γùï /robots.txt                            133 B         103 kB
-Γö£ ╞Æ /secure-portal                       2.44 kB         108 kB
-Γö£ Γùï /sitemap.xml                           133 B         103 kB
-Γöö ╞Æ /verify/[name]                         133 B         103 kB
-+ First Load JS shared by all             102 kB
-  Γö£ chunks/255-98a0bdaa30757bda.js       46.2 kB
-  Γö£ chunks/4bd1b696-c023c6e3521b1417.js  54.2 kB
-  Γöö other shared chunks (total)          1.99 kB
-
-
-╞Æ Middleware                             39.9 kB
-
-Γùï  (Static)   prerendered as static content
-ΓùÅ  (SSG)      prerendered as static HTML (uses generateStaticParams)
-╞Æ  (Dynamic)  server-rendered on demand
-

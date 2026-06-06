@@ -1,6 +1,6 @@
 {
-  "name": "fashion-beauty-jobs",
-  "version": "1.0.0",
+  "name": "luxe-editorial",
+  "version": "2.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.107.0",
-    "jose": "^6.0.11",
     "next": "^15.3.3",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
