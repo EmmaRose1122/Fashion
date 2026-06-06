@@ -14,10 +14,45 @@ export type ArticleActionState = {
 const STORAGE_BUCKET = "article-thumbnails";
 
 /**
+ * Ensure the storage bucket exists. If not, try to create it.
+ * Returns true if the bucket is ready, false otherwise.
+ */
+async function ensureBucket(): Promise<{ ok: boolean; message?: string }> {
+  const client = getSupabase();
+  try {
+    const { data: buckets, error } = await client.storage.listBuckets();
+    if (error) {
+      return { ok: false, message: `Could not list buckets: ${error.message}` };
+    }
+    const exists = buckets?.some((b) => b.name === STORAGE_BUCKET);
+    if (exists) return { ok: true };
+
+    // Try to create the bucket as public
+    const { error: createError } = await client.storage.createBucket(STORAGE_BUCKET, {
+      public: true,
+      fileSizeLimit: 5 * 1024 * 1024, // 5MB
+      allowedMimeTypes: ["image/jpeg", "image/png", "image/webp", "image/gif", "image/avif"],
+    });
+    if (createError) {
+      return {
+        ok: false,
+        message: `Bucket "${STORAGE_BUCKET}" not found and could not be created automatically: ${createError.message}. Create it manually in Supabase Storage (set Public: on) or paste an external image URL below.`,
+      };
+    }
+    return { ok: true };
+  } catch (err: any) {
+    return { ok: false, message: err?.message || "Unknown storage error." };
+  }
+}
+
+/**
  * Upload a thumbnail image to Supabase Storage and return its public URL.
  * If no file is provided (or upload fails), returns the original URL string.
  */
-async function uploadThumbnail(file: File | null, existingUrl: string | null): Promise<string | null> {
+async function uploadThumbnail(
+  file: File | null,
+  existingUrl: string | null
+): Promise<string | null> {
   const fallback = existingUrl && existingUrl.trim() ? existingUrl : null;
   if (!file || file.size === 0) return fallback;
 
@@ -30,6 +65,12 @@ async function uploadThumbnail(file: File | null, existingUrl: string | null): P
   // 5MB cap
   if (file.size > 5 * 1024 * 1024) {
     throw new Error("Image is too large. Maximum size is 5MB.");
+  }
+
+  // Make sure the bucket exists
+  const bucketStatus = await ensureBucket();
+  if (!bucketStatus.ok) {
+    throw new Error(bucketStatus.message || "Storage bucket unavailable.");
   }
 
   const client = getSupabase();
@@ -46,7 +87,7 @@ async function uploadThumbnail(file: File | null, existingUrl: string | null): P
     });
 
   if (uploadError) {
-    throw new Error(`Upload failed: ${uploadError.message}`);
+    throw new Error(`Upload failed: ${uploadError.message}. You can paste an external image URL below as an alternative.`);
   }
 
   const { data: publicUrlData } = client.storage

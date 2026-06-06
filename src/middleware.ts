@@ -4,6 +4,9 @@ import { jwtVerify } from "jose";
 
 const secretKey = new TextEncoder().encode(process.env.JWT_SECRET || "fallback-secret");
 
+// The standalone login page URL (kept out of /admin for obscurity).
+const LOGIN_PATH = "/secure-portal";
+
 export async function middleware(request: NextRequest) {
   const session = request.cookies.get("admin-session")?.value;
   const { pathname } = request.nextUrl;
@@ -11,10 +14,8 @@ export async function middleware(request: NextRequest) {
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-pathname", pathname);
 
-  // If path is under /admin
+  // Protect all /admin/* routes
   if (pathname.startsWith("/admin")) {
-    const isLoginPage = pathname === "/admin/login";
-
     let isValid = false;
     if (session) {
       try {
@@ -25,14 +26,8 @@ export async function middleware(request: NextRequest) {
       }
     }
 
-    // Not logged in but trying to access admin pages -> redirect to login
-    if (!isValid && !isLoginPage) {
-      return NextResponse.redirect(new URL("/admin/login", request.url));
-    }
-
-    // Already logged in but trying to access login page -> redirect to dashboard
-    if (isValid && isLoginPage) {
-      return NextResponse.redirect(new URL("/admin", request.url));
+    if (!isValid) {
+      return NextResponse.redirect(new URL(LOGIN_PATH, request.url));
     }
   }
 

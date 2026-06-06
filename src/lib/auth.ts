@@ -1,38 +1,49 @@
-import { SignJWT, jwtVerify } from 'jose';
-import { cookies } from 'next/headers';
+import { SignJWT, jwtVerify } from "jose";
+import { cookies } from "next/headers";
 
-const secretKey = new TextEncoder().encode(process.env.JWT_SECRET || 'fallback-secret');
+const secretKey = new TextEncoder().encode(process.env.JWT_SECRET || "fallback-secret");
 
-export async function createSession() {
-  const token = await new SignJWT({ role: 'admin' })
-    .setProtectedHeader({ alg: 'HS256' })
+export interface SessionPayload {
+  email: string;
+  role: "admin" | "editor";
+}
+
+export async function createSession(payload: SessionPayload) {
+  const token = await new SignJWT({ ...payload })
+    .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
-    .setExpirationTime('7d')
+    .setExpirationTime("7d")
     .sign(secretKey);
 
   const cookieStore = await cookies();
-  cookieStore.set('admin-session', token, {
+  cookieStore.set("admin-session", token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
     maxAge: 60 * 60 * 24 * 7,
-    path: '/',
+    path: "/",
   });
 }
 
-export async function verifySession(): Promise<boolean> {
+export async function verifySession(): Promise<SessionPayload | null> {
   try {
     const cookieStore = await cookies();
-    const token = cookieStore.get('admin-session')?.value;
-    if (!token) return false;
-    await jwtVerify(token, secretKey);
-    return true;
+    const token = cookieStore.get("admin-session")?.value;
+    if (!token) return null;
+    const { payload } = await jwtVerify(token, secretKey);
+    if (typeof payload.email === "string" && typeof payload.role === "string") {
+      return {
+        email: payload.email,
+        role: payload.role as SessionPayload["role"],
+      };
+    }
+    return null;
   } catch {
-    return false;
+    return null;
   }
 }
 
 export async function deleteSession() {
   const cookieStore = await cookies();
-  cookieStore.delete('admin-session');
+  cookieStore.delete("admin-session");
 }

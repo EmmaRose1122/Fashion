@@ -18,10 +18,8 @@ export function Navbar() {
   return (
     <nav className="sticky top-0 z-50 bg-surface/80 backdrop-blur-md border-b border-border/80 transition-all">
       <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-        {/* Logo */}
         <Logo size="md" />
 
-        {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-10">
           <Link
             href="/"
@@ -56,15 +54,8 @@ export function Navbar() {
               <span className="absolute -bottom-1 left-0 right-0 h-px bg-accent draw-line-x" />
             )}
           </Link>
-          <Link
-            href="/admin"
-            className="text-xs uppercase tracking-widest border border-accent/40 px-4 py-2 hover:bg-accent hover:text-white transition-all text-text-secondary rounded-sm hover:scale-105 active:scale-95"
-          >
-            Admin
-          </Link>
         </div>
 
-        {/* Mobile menu button */}
         <button
           onClick={() => setIsOpen(!isOpen)}
           className="md:hidden flex flex-col justify-center items-center w-6 h-6 space-y-1.5 focus:outline-none"
@@ -85,7 +76,6 @@ export function Navbar() {
         </button>
       </div>
 
-      {/* Mobile Navigation */}
       {isOpen && (
         <div className="md:hidden fixed inset-0 top-20 bg-background/98 z-40 border-t border-border/50 animate-fade-in overflow-y-auto">
           <div className="flex flex-col items-center justify-start pt-10 space-y-7 pb-20 px-6">
@@ -117,13 +107,6 @@ export function Navbar() {
                   }`}
               >
                 Jobs
-              </Link>
-              <Link
-                href="/admin"
-                onClick={() => setIsOpen(false)}
-                className="mt-4 text-base uppercase tracking-widest border border-accent/40 px-6 py-2.5 text-text-secondary hover:bg-accent hover:text-white transition-all rounded-sm"
-              >
-                Admin Panel
               </Link>
             </div>
           </div>

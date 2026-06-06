@@ -16,12 +16,17 @@ export default async function AdminLayout({
     return <>{children}</>;
   }
 
+  const navItems = [
+    { href: "/admin", label: "Console Overview" },
+    { href: "/admin/articles", label: "Manage Articles" },
+    { href: "/admin/jobs", label: "Manage Jobs" },
+    { href: "/admin/header", label: "Header & Site Code" },
+  ];
+
   return (
     <div className="min-h-screen flex bg-background text-text-primary">
-      {/* Sidebar */}
       <aside className="w-64 border-r border-border bg-surface flex flex-col justify-between fixed top-0 bottom-0 left-0 z-30">
         <div className="p-8 space-y-12">
-          {/* Logo */}
           <div className="space-y-1 text-left">
             <Link href="/" target="_blank" className="font-heading text-xl tracking-widest text-text-primary hover:opacity-85">
               {SITE_NAME}
@@ -29,30 +34,23 @@ export default async function AdminLayout({
             <span className="block text-[9px] uppercase tracking-widest text-accent font-bold">Admin Console</span>
           </div>
 
-          {/* Navigation Links */}
           <nav className="flex flex-col space-y-2 text-left">
-            <Link
-              href="/admin"
-              className="text-xs uppercase tracking-widest text-text-secondary hover:text-accent font-medium py-3 border-b border-border-light hover:border-accent/30 transition-all"
-            >
-              Console Overview
-            </Link>
-            <Link
-              href="/admin/articles"
-              className="text-xs uppercase tracking-widest text-text-secondary hover:text-accent font-medium py-3 border-b border-border-light hover:border-accent/30 transition-all"
-            >
-              Manage Articles
-            </Link>
-            <Link
-              href="/admin/jobs"
-              className="text-xs uppercase tracking-widest text-text-secondary hover:text-accent font-medium py-3 border-b border-border-light hover:border-accent/30 transition-all"
-            >
-              Manage Jobs
-            </Link>
+            {navItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`text-xs uppercase tracking-widest font-medium py-3 border-b border-border-light transition-all ${pathname === item.href ||
+                    (item.href !== "/admin" && pathname.startsWith(item.href))
+                    ? "text-accent border-accent/40"
+                    : "text-text-secondary hover:text-accent hover:border-accent/30"
+                  }`}
+              >
+                {item.label}
+              </Link>
+            ))}
           </nav>
         </div>
 
-        {/* Footer actions */}
         <div className="p-8 border-t border-border-light text-left">
           <form action={logout}>
             <button
@@ -65,7 +63,6 @@ export default async function AdminLayout({
         </div>
       </aside>
 
-      {/* Main Content Area */}
       <main className="flex-1 pl-64 min-h-screen flex flex-col">
         <div className="flex-1 p-8 md:p-12 max-w-7xl mx-auto w-full text-left">
           {children}

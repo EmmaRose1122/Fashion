@@ -3,6 +3,7 @@ import { Playfair_Display, Inter } from "next/font/google";
 import { headers } from "next/headers";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import { SiteCodeInjector, SiteBodyStart, SiteBodyEnd } from "@/components/SiteCodeInjector";
 import { SITE_NAME, SITE_DESCRIPTION, SITE_URL } from "@/lib/constants";
 import "./globals.css";
 
@@ -54,15 +55,18 @@ export default async function RootLayout({
   const headersList = await headers();
   const pathname = headersList.get("x-pathname") || "";
   const isAdmin = pathname.startsWith("/admin");
+  const isSecurePortal = pathname.startsWith("/secure-portal");
 
   return (
     <html lang="en" className={`${playfair.variable} ${inter.variable}`}>
       <body className="min-h-screen flex flex-col bg-background text-text-primary font-body antialiased">
-        {!isAdmin && <Navbar />}
+        <SiteCodeInjector />
+        {!isAdmin && !isSecurePortal && <Navbar />}
         <main className="flex-1 flex flex-col">
           {children}
         </main>
-        {!isAdmin && <Footer />}
+        {!isAdmin && !isSecurePortal && <Footer />}
+        <SiteBodyEnd />
       </body>
     </html>
   );
