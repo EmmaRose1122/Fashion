@@ -1,8 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CATEGORIES } from "@/lib/constants";
 import { generateArticle } from "@/actions/generateArticle";
+
+const STORAGE_KEY = "luxe_admin_settings";
+
+interface SavedSettings {
+    apiKey: string;
+    provider: "openai" | "anthropic" | "openrouter" | "custom";
+    customBaseUrl: string;
+    model: string;
+    systemPrompt: string;
+}
 
 interface ArticleFormState {
     title: string;
@@ -16,23 +26,60 @@ interface ArticleFormState {
     published: boolean;
 }
 
+const DEFAULT_SYSTEM_PROMPT = `You are an expert editorial writer for LUXE, a high-end fashion and lifestyle journal. 
+Write sophisticated, well-structured articles in the journal's voice: elegant, authoritative, 
+and quietly luxurious. Use refined vocabulary, varied sentence structures, and editorial 
+insight. Articles should feel curated, not generated.`;
+
+function loadSettings(): SavedSettings {
+    if (typeof window === "undefined") {
+        return {
+            apiKey: "",
+            provider: "openai",
+            customBaseUrl: "",
+            model: "",
+            systemPrompt: DEFAULT_SYSTEM_PROMPT,
+        };
+    }
+    try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+            return JSON.parse(raw);
+        }
+    } catch {
+        // ignore
+    }
+    return {
+        apiKey: "",
+        provider: "openai",
+        customBaseUrl: "",
+        model: "",
+        systemPrompt: DEFAULT_SYSTEM_PROMPT,
+    };
+}
+
+function saveSettings(settings: SavedSettings) {
+    if (typeof window === "undefined") return;
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+    } catch {
+        // ignore
+    }
+}
+
 export function ArticleForm() {
     const [activeTab, setActiveTab] = useState<"ai" | "manual">("ai");
     const [isLoading, setIsLoading] = useState(false);
+    const [isHydrated, setIsHydrated] = useState(false);
     const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
-    // AI Generation state
+    // AI Generation state (persisted)
     const [apiKey, setApiKey] = useState("");
     const [provider, setProvider] = useState<"openai" | "anthropic" | "openrouter" | "custom">("openai");
     const [customBaseUrl, setCustomBaseUrl] = useState("");
     const [model, setModel] = useState("");
     const [prompt, setPrompt] = useState("");
-    const [systemPrompt, setSystemPrompt] = useState(
-        `You are an expert editorial writer for LUXE, a high-end fashion and lifestyle journal. 
-Write sophisticated, well-structured articles in the journal's voice: elegant, authoritative, 
-and quietly luxurious. Use refined vocabulary, varied sentence structures, and editorial 
-insight. Articles should feel curated, not generated.`
-    );
+    const [systemPrompt, setSystemPrompt] = useState(DEFAULT_SYSTEM_PROMPT);
 
     // Manual form state
     const [manualForm, setManualForm] = useState<ArticleFormState>({
@@ -46,6 +93,37 @@ insight. Articles should feel curated, not generated.`
         featured: false,
         published: false,
     });
+
+    // Load saved settings on mount
+    useEffect(() => {
+        const saved = loadSettings();
+        setApiKey(saved.apiKey);
+        setProvider(saved.provider);
+        setCustomBaseUrl(saved.customBaseUrl);
+        setModel(saved.model);
+        setSystemPrompt(saved.systemPrompt);
+        setIsHydrated(true);
+    }, []);
+
+    // Persist settings whenever they change (after hydration)
+    useEffect(() => {
+        if (!isHydrated) return;
+        saveSettings({
+            apiKey,
+            provider,
+            customBaseUrl,
+            model,
+            systemPrompt,
+        });
+    }, [apiKey, provider, customBaseUrl, model, systemPrompt, isHydrated]);
+
+    const handleClearKey = () => {
+        if (confirm("Clear saved API key and settings from this browser?")) {
+            setApiKey("");
+            setCustomBaseUrl("");
+            setModel("");
+        }
+    };
 
     const handleAiSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -71,7 +149,6 @@ insight. Articles should feel curated, not generated.`
                 setMessage({ type: "error", text: result.error });
             } else {
                 setMessage({ type: "success", text: "Article generated successfully! Review and save below." });
-                // Populate manual form with generated content
                 if (result.article) {
                     setManualForm({
                         title: result.article.title,
@@ -231,9 +308,26 @@ insight. Articles should feel curated, not generated.`
                     )}
 
                     <div className="space-y-3">
-                        <label className="block text-sm font-medium text-text-secondary">
-                            API Key
-                        </label>
+                        <div className="flex items-center justify-between">
+                            <label className="block text-sm font-medium text-text-secondary">
+                                API Key
+                                {apiKey && (
+                                    <span className="ml-2 inline-flex items-center gap-1 text-xs text-green-700">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-green-600 inline-block" />
+                                        Saved
+                                    </span>
+                                )}
+                            </label>
+                            {apiKey && (
+                                <button
+                                    type="button"
+                                    onClick={handleClearKey}
+                                    className="text-xs text-text-secondary hover:text-accent underline transition-colors"
+                                >
+                                    Clear saved key
+                                </button>
+                            )}
+                        </div>
                         <input
                             type="password"
                             value={apiKey}
@@ -241,9 +335,10 @@ insight. Articles should feel curated, not generated.`
                             placeholder="sk-... or your API key"
                             className="w-full px-4 py-2 border border-border rounded-lg bg-surface text-text-primary focus:ring-2 focus:ring-accent focus:border-accent"
                             required
+                            autoComplete="off"
                         />
                         <p className="text-xs text-text-secondary">
-                            Your API key is used only for this request and not stored.
+                            Your API key is saved locally in this browser (localStorage). It is sent to the server only when you click "Generate Article".
                         </p>
                     </div>
 
