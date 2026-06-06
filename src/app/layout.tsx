@@ -25,13 +25,20 @@ export const metadata: Metadata = {
     template: `%s | ${SITE_NAME}`,
   },
   description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
+  authors: [{ name: SITE_NAME }],
+  keywords: ["fashion", "beauty", "lifestyle", "editorial", "careers", "luxury"],
   openGraph: {
     type: "website",
     locale: "en_US",
     siteName: SITE_NAME,
+    title: `${SITE_NAME} — Fashion, Beauty & Careers`,
+    description: SITE_DESCRIPTION,
   },
   twitter: {
     card: "summary_large_image",
+    title: `${SITE_NAME} — Fashion, Beauty & Careers`,
+    description: SITE_DESCRIPTION,
   },
   robots: {
     index: true,
