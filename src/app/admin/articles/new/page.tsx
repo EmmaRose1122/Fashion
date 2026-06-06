@@ -1,11 +1,25 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { createArticle } from "@/actions/articles";
+import { CATEGORIES } from "@/lib/constants";
 
 export default function NewArticlePage() {
   const [state, action, isPending] = useActionState(createArticle, undefined);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) {
+      setPreviewUrl(null);
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => setPreviewUrl(reader.result as string);
+    reader.readAsDataURL(file);
+  }
 
   return (
     <div className="space-y-8 text-left max-w-3xl">
@@ -13,10 +27,10 @@ export default function NewArticlePage() {
       <div className="border-b border-border-light pb-6 space-y-1">
         <span className="text-[10px] uppercase tracking-widest text-accent font-bold">Console</span>
         <h1 className="font-heading text-2xl md:text-3xl font-bold">Write New Article</h1>
-        <p className="text-xs text-text-secondary">Create a new post for your fashion or beauty sections.</p>
+        <p className="text-xs text-text-secondary">Create a new post for your editorial sections.</p>
       </div>
 
-      <form action={action} className="space-y-6">
+      <form action={action} className="space-y-6" encType="multipart/form-data">
         {state?.error && (
           <div className="text-xs text-red-500 font-medium bg-red-50 border border-red-100 p-4 rounded-sm">
             {state.error}
@@ -62,10 +76,12 @@ export default function NewArticlePage() {
               name="category"
               id="category"
               required
+              defaultValue="fashion"
               className="w-full text-sm border border-border bg-surface px-4 py-3 rounded-sm focus:outline-none focus:border-accent text-text-primary"
             >
-              <option value="fashion">Fashion</option>
-              <option value="beauty">Beauty</option>
+              {CATEGORIES.map((cat) => (
+                <option key={cat.slug} value={cat.slug}>{cat.name}</option>
+              ))}
             </select>
           </div>
 
@@ -84,18 +100,59 @@ export default function NewArticlePage() {
             />
           </div>
 
-          {/* Thumbnail Image URL */}
+          {/* Thumbnail Image Upload */}
           <div className="space-y-2 md:col-span-2">
-            <label htmlFor="thumbnail" className="block text-[10px] uppercase tracking-wider text-text-secondary font-bold">
-              Thumbnail / Featured Image URL
+            <label className="block text-[10px] uppercase tracking-wider text-text-secondary font-bold">
+              Thumbnail / Featured Image
             </label>
-            <input
-              type="text"
-              name="thumbnail"
-              id="thumbnail"
-              placeholder="https://images.unsplash.com/photo-... or /uploads/..."
-              className="w-full text-sm border border-border bg-surface px-4 py-3 rounded-sm focus:outline-none focus:border-accent text-text-primary"
-            />
+
+            {/* Preview */}
+            {previewUrl && (
+              <div className="relative aspect-[16/9] w-full max-w-md overflow-hidden bg-border-light rounded-sm border border-border">
+                <Image
+                  src={previewUrl}
+                  alt="Thumbnail preview"
+                  fill
+                  unoptimized
+                  className="object-cover"
+                />
+              </div>
+            )}
+
+            {/* File Upload */}
+            <div className="space-y-2">
+              <label htmlFor="thumbnailFile" className="block text-[10px] uppercase tracking-wider text-text-secondary font-semibold">
+                Upload Image
+              </label>
+              <input
+                type="file"
+                name="thumbnailFile"
+                id="thumbnailFile"
+                accept="image/jpeg,image/png,image/webp,image/gif,image/avif"
+                onChange={handleFileChange}
+                className="w-full text-xs text-text-secondary file:mr-4 file:py-2 file:px-4 file:border-0 file:text-xs file:uppercase file:tracking-widest file:font-semibold file:bg-accent file:text-white file:cursor-pointer hover:file:bg-accent-hover file:rounded-sm cursor-pointer border border-border bg-surface rounded-sm"
+              />
+              <p className="text-[10px] text-text-secondary/60">
+                JPG, PNG, WebP, GIF, or AVIF. Maximum 5MB. Recommended size: 1200x675px.
+              </p>
+            </div>
+
+            {/* OR — Image URL */}
+            <div className="space-y-2 pt-3 border-t border-border-light">
+              <label htmlFor="thumbnail" className="block text-[10px] uppercase tracking-wider text-text-secondary font-semibold">
+                Or Use External Image URL
+              </label>
+              <input
+                type="text"
+                name="thumbnail"
+                id="thumbnail"
+                placeholder="https://images.unsplash.com/photo-..."
+                className="w-full text-sm border border-border bg-surface px-4 py-3 rounded-sm focus:outline-none focus:border-accent text-text-primary"
+              />
+              <p className="text-[10px] text-text-secondary/60">
+                Use an external image URL if you prefer not to upload. This will only be used when no file is uploaded.
+              </p>
+            </div>
           </div>
 
           {/* Tags */}
@@ -136,7 +193,7 @@ export default function NewArticlePage() {
               name="published"
               id="published"
               defaultChecked
-              className="w-4 w-4 text-accent border-border rounded focus:ring-accent"
+              className="w-4 h-4 text-accent border-border rounded focus:ring-accent"
             />
             <span className="text-xs uppercase tracking-wider text-text-secondary font-bold select-none">
               Publish Immediately
@@ -148,7 +205,7 @@ export default function NewArticlePage() {
               type="checkbox"
               name="featured"
               id="featured"
-              className="w-4 w-4 text-accent border-border rounded focus:ring-accent"
+              className="w-4 h-4 text-accent border-border rounded focus:ring-accent"
             />
             <span className="text-xs uppercase tracking-wider text-text-secondary font-bold select-none">
               Feature on Homepage

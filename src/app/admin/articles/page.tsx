@@ -51,11 +51,11 @@ export default async function AdminArticlesListPage() {
                     <td className="px-6 py-4 capitalize text-xs">{article.category}</td>
                     <td className="px-6 py-4">
                       {article.published ? (
-                        <span className="inline-block text-[9px] uppercase tracking-wider bg-green-50 text-green-700 border border-green-150 px-2 py-0.5 rounded-sm font-semibold">
+                        <span className="inline-block text-[9px] uppercase tracking-wider bg-green-50 text-green-700 border border-green-200 px-2 py-0.5 rounded-sm font-semibold">
                           Published
                         </span>
                       ) : (
-                        <span className="inline-block text-[9px] uppercase tracking-wider bg-yellow-50 text-yellow-700 border border-yellow-150 px-2 py-0.5 rounded-sm font-semibold">
+                        <span className="inline-block text-[9px] uppercase tracking-wider bg-yellow-50 text-yellow-700 border border-yellow-200 px-2 py-0.5 rounded-sm font-semibold">
                           Draft
                         </span>
                       )}
@@ -100,7 +100,7 @@ export default async function AdminArticlesListPage() {
         </div>
       ) : (
         <div className="py-24 border border-dashed border-border text-center text-text-secondary text-sm rounded-sm">
-          No articles written yet. Click &quot;New Article&quot; to write your first story.
+          No articles written yet. Click "New Article" to write your first story.
         </div>
       )}
     </div>

@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { SITE_URL } from "@/lib/constants";
+import { SITE_URL, CATEGORIES } from "@/lib/constants";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticUrls: MetadataRoute.Sitemap = [
@@ -9,43 +9,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "daily",
       priority: 1.0,
     },
-    {
-      url: `${SITE_URL}/fashion`,
+    ...CATEGORIES.map((cat) => ({
+      url: `${SITE_URL}/${cat.slug}`,
       lastModified: new Date(),
-      changeFrequency: "daily",
+      changeFrequency: "daily" as const,
       priority: 0.9,
-    },
-    {
-      url: `${SITE_URL}/beauty`,
-      lastModified: new Date(),
-      changeFrequency: "daily",
-      priority: 0.9,
-    },
-    {
-      url: `${SITE_URL}/jobs`,
-      lastModified: new Date(),
-      changeFrequency: "daily",
-      priority: 0.9,
-    },
+    })),
   ];
 
   try {
     // Dynamic import so the module isn't evaluated at build time when env vars may be absent
     const { supabase } = await import("@/lib/supabase");
 
-    const [articlesRes, jobsRes] = await Promise.all([
-      supabase
-        .from("Article")
-        .select("slug, category, updatedAt")
-        .eq("published", true),
-      supabase
-        .from("Job")
-        .select("id, updatedAt")
-        .eq("active", true),
-    ]);
+    const articlesRes = await supabase
+      .from("Article")
+      .select("slug, category, updatedAt")
+      .eq("published", true);
 
     const articles = articlesRes.data || [];
-    const jobs = jobsRes.data || [];
 
     const articleUrls: MetadataRoute.Sitemap = articles.map((article) => ({
       url: `${SITE_URL}/${article.category}/${article.slug}`,
@@ -54,14 +35,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     }));
 
-    const jobUrls: MetadataRoute.Sitemap = jobs.map((job) => ({
-      url: `${SITE_URL}/jobs/${job.id}`,
-      lastModified: job.updatedAt,
-      changeFrequency: "daily",
-      priority: 0.9,
-    }));
-
-    return [...staticUrls, ...articleUrls, ...jobUrls];
+    return [...staticUrls, ...articleUrls];
   } catch {
     // During build or when Supabase isn't configured, return only static URLs
     return staticUrls;

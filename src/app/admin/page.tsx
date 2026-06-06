@@ -54,7 +54,7 @@ export default async function AdminDashboardOverview() {
           <div className="bg-surface border border-border p-6 rounded-sm flex justify-between items-center">
             <div className="space-y-1">
               <h3 className="font-heading text-lg font-bold">New Editorial Article</h3>
-              <p className="text-xs text-text-secondary">Publish a story under Fashion or Beauty.</p>
+              <p className="text-xs text-text-secondary">Publish a story under any editorial section.</p>
             </div>
             <Link
               href="/admin/articles/new"

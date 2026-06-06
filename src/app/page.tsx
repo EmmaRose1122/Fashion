@@ -2,8 +2,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 import { ArticleCard } from "@/components/ui/ArticleCard";
-import { JobCard } from "@/components/ui/JobCard";
 import { formatDate } from "@/lib/utils";
+import { CATEGORIES } from "@/lib/constants";
 
 // Make the page dynamic so it fetches fresh DB content
 export const revalidate = 0;
@@ -47,16 +47,20 @@ export default async function HomePage() {
 
   const latestArticles = (await latestArticlesQuery).data || [];
 
-  // Fetch featured jobs
-  const featuredJobs = (
-    await supabase
-      .from("Job")
-      .select("*")
-      .eq("active", true)
-      .eq("featured", true)
-      .order("createdAt", { ascending: false })
-      .limit(3)
-  ).data || [];
+  // Fetch articles per category for the category showcase
+  const categoryArticles: Record<string, any[]> = {};
+  for (const cat of CATEGORIES) {
+    const data = (
+      await supabase
+        .from("Article")
+        .select("*")
+        .eq("category", cat.slug)
+        .eq("published", true)
+        .order("createdAt", { ascending: false })
+        .limit(3)
+    ).data || [];
+    categoryArticles[cat.slug] = data;
+  }
 
   return (
     <div className="space-y-24 pb-24">
@@ -89,7 +93,7 @@ export default async function HomePage() {
               <div className="flex items-center space-x-2 text-[10px] uppercase tracking-widest text-accent font-bold">
                 <span>Featured</span>
                 <span className="text-border">•</span>
-                <span className="text-text-secondary font-medium">{featuredArticle.category}</span>
+                <span className="text-text-secondary font-medium capitalize">{featuredArticle.category.replace("-", " ")}</span>
                 <span className="text-border">•</span>
                 <span className="text-text-secondary font-medium">{formatDate(featuredArticle.createdAt)}</span>
               </div>
@@ -120,6 +124,38 @@ export default async function HomePage() {
         </section>
       )}
 
+      {/* Categories Showcase */}
+      <section className="max-w-7xl mx-auto px-6 space-y-12">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-border-light pb-6 text-left">
+          <div className="space-y-1">
+            <span className="text-[10px] uppercase tracking-widest text-accent font-bold">Explore</span>
+            <h2 className="text-2xl md:text-3xl font-bold font-heading">Browse by Category</h2>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+          {CATEGORIES.map((cat) => (
+            <Link
+              key={cat.slug}
+              href={`/${cat.slug}`}
+              className="group relative overflow-hidden bg-surface border border-border hover:border-accent transition-all rounded-sm p-6 flex flex-col items-start justify-between min-h-[140px]"
+            >
+              <span className="text-[10px] uppercase tracking-widest text-accent font-bold">
+                Category
+              </span>
+              <div className="space-y-1">
+                <h3 className="font-heading text-base md:text-lg font-bold group-hover:text-accent transition-colors">
+                  {cat.name}
+                </h3>
+                <span className="text-[10px] text-text-secondary/60 font-medium">
+                  {categoryArticles[cat.slug]?.length || 0} stories →
+                </span>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
       {/* Latest Articles */}
       <section className="max-w-7xl mx-auto px-6 space-y-12">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-border-light pb-6 text-left">
@@ -127,13 +163,16 @@ export default async function HomePage() {
             <span className="text-[10px] uppercase tracking-widest text-accent font-bold">The Journal</span>
             <h2 className="text-2xl md:text-3xl font-bold font-heading">Latest Stories</h2>
           </div>
-          <div className="flex space-x-4">
-            <Link href="/fashion" className="text-xs uppercase tracking-widest text-text-secondary hover:text-accent transition-colors">
-              Fashion →
-            </Link>
-            <Link href="/beauty" className="text-xs uppercase tracking-widest text-text-secondary hover:text-accent transition-colors">
-              Beauty →
-            </Link>
+          <div className="flex flex-wrap gap-x-4 gap-y-2">
+            {CATEGORIES.slice(0, 3).map((cat) => (
+              <Link
+                key={cat.slug}
+                href={`/${cat.slug}`}
+                className="text-xs uppercase tracking-widest text-text-secondary hover:text-accent transition-colors"
+              >
+                {cat.name} →
+              </Link>
+            ))}
           </div>
         </div>
 
@@ -150,39 +189,28 @@ export default async function HomePage() {
         )}
       </section>
 
-      {/* Careers / Job Board Highlight */}
-      <section className="bg-surface border-y border-border py-24">
-        <div className="max-w-5xl mx-auto px-6 space-y-12">
-          <div className="text-center space-y-3">
-            <span className="text-[10px] uppercase tracking-widest text-accent font-bold">Opportunities</span>
-            <h2 className="text-3xl md:text-4xl font-bold font-heading">Curated Career Board</h2>
-            <p className="text-sm text-text-secondary max-w-lg mx-auto">
-              Discover select vacancies in leading fashion houses, beauty brands, and premium design agencies.
-            </p>
-          </div>
-
-          <div className="space-y-4 text-left">
-            {featuredJobs.length > 0 ? (
-              featuredJobs.map((job) => (
-                <JobCard key={job.id} job={job} />
-              ))
-            ) : (
-              <div className="py-12 border border-dashed border-border text-center text-text-secondary text-sm bg-background">
-                No featured jobs currently listed.
-              </div>
-            )}
-          </div>
-
-          <div className="text-center pt-4">
+      {/* Category Highlights */}
+      {CATEGORIES.filter((c) => categoryArticles[c.slug]?.length > 0).slice(0, 2).map((cat) => (
+        <section key={cat.slug} className="max-w-7xl mx-auto px-6 space-y-12">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-border-light pb-6 text-left">
+            <div className="space-y-1">
+              <span className="text-[10px] uppercase tracking-widest text-accent font-bold">Featured</span>
+              <h2 className="text-2xl md:text-3xl font-bold font-heading">{cat.name} Highlights</h2>
+            </div>
             <Link
-              href="/jobs"
-              className="inline-block text-xs uppercase tracking-widest bg-text-primary hover:bg-accent text-white px-8 py-4 rounded-sm font-semibold transition-colors"
+              href={`/${cat.slug}`}
+              className="text-xs uppercase tracking-widest text-text-secondary hover:text-accent transition-colors"
             >
-              Explore Job Board
+              View All {cat.name} →
             </Link>
           </div>
-        </div>
-      </section>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-16">
+            {categoryArticles[cat.slug].slice(0, 3).map((article) => (
+              <ArticleCard key={article.id} article={article} />
+            ))}
+          </div>
+        </section>
+      ))}
     </div>
   );
 }

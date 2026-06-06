@@ -53,11 +53,11 @@ export default async function AdminJobsListPage() {
                     <td className="px-6 py-4 text-xs">{job.type || "Full-time"}</td>
                     <td className="px-6 py-4">
                       {job.active ? (
-                        <span className="inline-block text-[9px] uppercase tracking-wider bg-green-50 text-green-700 border border-green-150 px-2 py-0.5 rounded-sm font-semibold">
+                        <span className="inline-block text-[9px] uppercase tracking-wider bg-green-50 text-green-700 border border-green-200 px-2 py-0.5 rounded-sm font-semibold">
                           Active
                         </span>
                       ) : (
-                        <span className="inline-block text-[9px] uppercase tracking-wider bg-red-50 text-red-700 border border-red-150 px-2 py-0.5 rounded-sm font-semibold">
+                        <span className="inline-block text-[9px] uppercase tracking-wider bg-red-50 text-red-700 border border-red-200 px-2 py-0.5 rounded-sm font-semibold">
                           Inactive
                         </span>
                       )}
@@ -94,7 +94,7 @@ export default async function AdminJobsListPage() {
         </div>
       ) : (
         <div className="py-24 border border-dashed border-border text-center text-text-secondary text-sm rounded-sm">
-          No job opportunities posted yet. Click &quot;New Job Listing&quot; to create your first vacancy.
+          No job opportunities posted yet. Click "New Job Listing" to create your first vacancy.
         </div>
       )}
     </div>
